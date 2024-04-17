@@ -1,5 +1,5 @@
 #pragma once
-#include "Vector3.h"
+#include "Matrix4x4.h"
 
 /// <summary>
 /// 計算クラスの宣言
@@ -14,82 +14,84 @@ public://メンバ関数
 	Calculation();
 
 	/// <summary>
-	/// 3次元ベクトルの計算結果表示用
+	/// 4x4行列の数値表示
 	/// </summary>
 	/// <param name="x"></param>
 	/// <param name="y"></param>
-	/// <param name="vector"></param>
-	/// <param name="label"></param>
-	void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
+	/// <param name="matrix"></param>
+	void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix,const char *label);
+
+#pragma region //4x4行列関数の作成
 
 	/// <summary>
-	/// 加減
+	/// 1. 行列の加法
 	/// </summary>
-	/// <param name="v1"></param>
-	/// <param name="v2"></param>
+	/// <param name="m1"></param>
+	/// <param name="m2"></param>
 	/// <returns></returns>
-	Vector3 Add(const Vector3& v1, const Vector3& v2);
+	Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2);
 
 	/// <summary>
-	/// 減算
+	/// 2. 行列の減法
 	/// </summary>
-	/// <param name="v1"></param>
-	/// <param name="v2"></param>
+	/// <param name="m1"></param>
+	/// <param name="m2"></param>
 	/// <returns></returns>
-	Vector3 Subtract(const Vector3& v1, const Vector3& v2);
+	Matrix4x4 Subtract(const Matrix4x4& m1, const Matrix4x4& m2);
 
 	/// <summary>
-	/// スカラー倍
+	/// 3. 行列の積
 	/// </summary>
-	/// <param name="scalar"></param>
-	/// <param name="v2"></param>
+	/// <param name="m1"></param>
+	/// <param name="m2"></param>
 	/// <returns></returns>
-	Vector3 Multiply(float scalar, const Vector3& v2);
+	Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
 
 	/// <summary>
-	/// 内積
+	/// 4. 逆行列
 	/// </summary>
-	/// <param name="v1"></param>
-	/// <param name="v2"></param>
+	/// <param name="m"></param>
 	/// <returns></returns>
-	float Dot(const Vector3& v1, const Vector3& v2);
+	Matrix4x4 Inverse(const Matrix4x4& m);
 
 	/// <summary>
-	/// ノルム(長さ)
+	/// 5. 転置行列
 	/// </summary>
-	/// <param name="v"></param>
+	/// <param name="m"></param>
 	/// <returns></returns>
-	float Length(const Vector3& v);
+	Matrix4x4 Transpose(const Matrix4x4& m);
 
 	/// <summary>
-	/// 正規化
+	/// 6. 単位行列
 	/// </summary>
-	/// <param name="v"></param>
 	/// <returns></returns>
-	Vector3 Normalize(const Vector3& v);
+	Matrix4x4 MakeIdentity4x4();
 
 	/// <summary>
-	/// 更新処理用
+	/// 更新処理
 	/// </summary>
 	void Update();
 
 	/// <summary>
-	/// 描画処理用
+	/// 描画処理
 	/// </summary>
 	void Draw();
 
+#pragma endregion
+
 public:
 
-	Vector3 v1_;
-	Vector3 v2_;
-	float k_;
+	Matrix4x4 m1_;
+	Matrix4x4 m2_;
 
-	Vector3 resultAdd_;
-	Vector3 resultSubtract_;
-	Vector3 resultMultiply_;
-	float resultDot_;
-	float resultLength_;
-	Vector3 resultNormalize_;
+	Matrix4x4 resultAdd_;
+	Matrix4x4 resultSubtract_;
+	Matrix4x4 resultMultiply_;
+	Matrix4x4 inverseM1_;
+	Matrix4x4 inverseM2_;
+	Matrix4x4 transposeM1_;
+	Matrix4x4 transposeM2_;
+	Matrix4x4 identity_;
 
 };
 
