@@ -2,6 +2,7 @@
 #include <Novice.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <cassert>
 
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
@@ -11,269 +12,135 @@ static const int kColumnWidth = 60;
 /// </summary>
 Calculation::Calculation()
 {
-	m1_ = { 3.2f,0.7f,9.6f,4.4f,
-			5.5f,1.3f,7.8f,2.1f,
-			6.9f,8.0f,2.6f,1.0f,
-			0.5f,7.2f,5.1f,3.3f,
+#pragma region 定義しなければならない
+
+	translate_ = { 4.1f,2.6f,0.8f };
+	scale_ = { 1.5f,5.2f,7.3f };
+	point_ = { 2.3f,3.8f,1.4f };
+	transformed_ = {};
+
+	translateMatrix_ = {};
+	scaleMatrix_ = {};
+	transformMatrix_ = {
+		1.0f,2.0f,3.0f,4.0f,
+		3.0f,1.0f,1.0f,2.0f,
+		1.0f,4.0f,2.0f,3.0f,
+		2.0f,2.0f,1.0f,3.0f,
 	};
 
-	m2_ = { 4.1f,6.5f,3.3f,2.2f,
-			8.8f,0.6f,9.9f,7.7f,
-			1.1f,5.5f,6.6f,0.0f,
-			3.3f,9.9f,8.8f,2.2f,
-	};
-
-	resultAdd_ = {};
-	resultSubtract_ = {};
-	resultMultiply_ = {};
-	inverseM1_ = {};
-	inverseM2_ = {};
-	transposeM1_ = {};
-	transposeM2_ = {};
-	identity_ = {};
-
+#pragma endregion
 }
 
+/// <summary>
+/// 3次元ベクトルの数値表示
+/// </summary>
+/// <param name="x">座標X</param>
+/// <param name="y">座標Y</param>
+/// <param name="vector">3次元ベクトル</param>
+/// <param name="label">文字列</param>
+void Calculation::VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label)
+{
+	Novice::ScreenPrintf(x, y, "%.02f", vector.x);
+	Novice::ScreenPrintf(x + kColumnWidth, y, "%.02f", vector.y);
+	Novice::ScreenPrintf(x + kColumnWidth * 2, y, "%.02f", vector.z);
+	Novice::ScreenPrintf(x + kColumnWidth * 3, y, "%s", label);
+}
+
+/// <summary>
+/// 4x4行列の数値表示
+/// </summary>
+/// <param name="x">座標X</param>
+/// <param name="y">座標Y</param>
+/// <param name="matrix">4x4行列</param>
+/// <param name="label">文字列</param>
 void Calculation::MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label)
 {
-	Novice::ScreenPrintf(x, y, label);
+	Novice::ScreenPrintf(x, y + 20 , label);
 
 	for (int row = 0; row < 4; row++)
 	{
 		for (int column = 0; column < 4; column++)
 		{
-			Novice::ScreenPrintf(x + column * kColumnWidth, y + row * kRowHeight + 22 , "%6.02f", matrix.m[row][column]);
+			Novice::ScreenPrintf(x + column * kColumnWidth, y + row * kRowHeight + 40 , "%6.02f", matrix.m[row][column]);
 		}
 	}
 }
 
 /// <summary>
-/// 加法
+/// 1. 平行移動行列
 /// </summary>
-/// <param name="m1"></param>
-/// <param name="m2"></param>
+/// <param name="translate">座標</param>
 /// <returns></returns>
-Matrix4x4 Calculation::Add(const Matrix4x4& m1, const Matrix4x4& m2)
+Matrix4x4 Calculation::MakeTranslateMatrix(const Vector3& translate)
 {
-	Matrix4x4 AddMatrix{};
+	Matrix4x4 resultTranslate = {
+		1.0f,0.0f,0.0f,0.0f,
+		0.0f,1.0f,0.0f,0.0f,
+		0.0f,0.0f,1.0f,0.0f,
+		translate.x,translate.y,translate.z,1.0f
+	};
 
-	for (int i = 0; i < 4; i++)
-	{
-		for (int j = 0; j < 4; j++)
-		{
-			AddMatrix.m[i][j] = m1.m[i][j] + m2.m[i][j];
-		}
-	}
-
-	return AddMatrix;
+	return resultTranslate;
 }
 
 /// <summary>
-/// 減法
+/// 2. 拡大縮小行列
 /// </summary>
-/// <param name="m1"></param>
-/// <param name="m2"></param>
+/// <param name="scale">大きさ</param>
 /// <returns></returns>
-Matrix4x4 Calculation::Subtract(const Matrix4x4& m1, const Matrix4x4& m2)
+Matrix4x4 Calculation::MakeScaleMatrix(const Vector3& scale)
 {
-	Matrix4x4 SubtractMatrix{};
+	Matrix4x4 resultScale = {
+		scale.x,0.0f,0.0f,0.0f,
+		0.0f,scale.y,0.0f,0.0f,
+		0.0f,0.0f,scale.z,0.0f,
+		0.0f,0.0f,0.0f,1.0f
+	};
 
-	for (int i = 0; i < 4; i++)
-	{
-		for (int j = 0; j < 4; j++)
-		{
-			SubtractMatrix.m[i][j] = m1.m[i][j] - m2.m[i][j];
-		}
-	}
-
-	return SubtractMatrix;
+	return resultScale;
 }
 
 /// <summary>
-/// 行列の積
+/// 3. 座標変換
 /// </summary>
-/// <param name="m1"></param>
-/// <param name="m2"></param>
+/// <param name="vector">3次元ベクトル</param>
+/// <param name="matrix">4x4行列</param>
 /// <returns></returns>
-Matrix4x4 Calculation::Multiply(const Matrix4x4& m1, const Matrix4x4& m2)
+Vector3 Calculation::Transform(const Vector3& vector, const Matrix4x4& matrix)
 {
-	Matrix4x4 MultiplyMatrix{};
+	Vector3 result;
 
-	for (int i = 0; i < 4; i++)
-	{
-		for (int j = 0; j < 4; j++)
-		{
-			MultiplyMatrix.m[i][j] = 0;
-			for (int k = 0; k < 4; k++)
-			{
-				MultiplyMatrix.m[i][j] += m1.m[i][k] * m2.m[k][j];
-			}
-		}
-	}
+	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + vector.z * matrix.m[2][0] +  matrix.m[3][0];
+	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + vector.z * matrix.m[2][1] +  matrix.m[3][1];
+	result.z = vector.x * matrix.m[0][2] + vector.y * matrix.m[1][2] + vector.z * matrix.m[2][2] +  matrix.m[3][2];
+	float w =  vector.x * matrix.m[0][3] + vector.y * matrix.m[1][3] + vector.z * matrix.m[2][3] +  matrix.m[3][3];
 
-	return MultiplyMatrix;
-}
+	assert(w != 0.0f);
+	result.x /= w;
+	result.y /= w;
+	result.z /= w;
 
-/// <summary>
-/// 逆行列
-/// </summary>
-/// <param name="m"></param>
-/// <returns></returns>
-Matrix4x4 Calculation::Inverse(const Matrix4x4& m)
-{
-#pragma region //4x4行列の行列式Aを求める
-	float MatrixA = (m.m[0][0] * m.m[1][1] * m.m[2][2] * m.m[3][3] + m.m[0][0] * m.m[1][2] * m.m[2][3] * m.m[3][1] + m.m[0][0] * m.m[1][3] * m.m[2][1] * m.m[3][2] -
-		             m.m[0][0] * m.m[1][3] * m.m[2][2] * m.m[3][1] - m.m[0][0] * m.m[1][2] * m.m[2][1] * m.m[3][3] - m.m[0][0] * m.m[1][1] * m.m[2][3] * m.m[3][2] -
-		             m.m[0][1] * m.m[1][0] * m.m[2][2] * m.m[3][3] - m.m[0][2] * m.m[1][0] * m.m[2][3] * m.m[3][1] - m.m[0][3] * m.m[1][0] * m.m[2][1] * m.m[3][2] +
-		             m.m[0][3] * m.m[1][0] * m.m[2][2] * m.m[3][1] + m.m[0][2] * m.m[1][0] * m.m[2][1] * m.m[3][3] + m.m[0][1] * m.m[1][0] * m.m[2][3] * m.m[3][2] +
-		             m.m[0][1] * m.m[1][2] * m.m[2][0] * m.m[3][3] + m.m[0][2] * m.m[1][3] * m.m[2][0] * m.m[3][1] + m.m[0][3] * m.m[1][1] * m.m[2][0] * m.m[3][2] -
-		             m.m[0][3] * m.m[1][2] * m.m[2][0] * m.m[3][1] - m.m[0][2] * m.m[1][1] * m.m[2][0] * m.m[3][3] - m.m[0][1] * m.m[1][3] * m.m[2][0] * m.m[3][2] -
-		             m.m[0][1] * m.m[1][2] * m.m[2][3] * m.m[3][0] - m.m[0][2] * m.m[1][3] * m.m[2][1] * m.m[3][0] - m.m[0][3] * m.m[1][1] * m.m[2][2] * m.m[3][0] +
-		             m.m[0][3] * m.m[1][2] * m.m[2][1] * m.m[3][0] + m.m[0][2] * m.m[1][1] * m.m[2][3] * m.m[3][0] + m.m[0][1] * m.m[1][3] * m.m[2][2] * m.m[3][0]);
-#pragma endregion
-
-	Matrix4x4 result;
-#pragma region 0列目の逆行列を求める
-
-	result.m[0][0] = (m.m[1][1] * m.m[2][2] * m.m[3][3] + m.m[1][2] * m.m[2][3] * m.m[3][1] + m.m[1][3] * m.m[2][1] * m.m[3][2] -
-		m.m[1][3] * m.m[2][2] * m.m[3][1] - m.m[1][2] * m.m[2][1] * m.m[3][3] - m.m[1][1] * m.m[2][3] * m.m[3][2]) / MatrixA;
-
-	result.m[0][1] = (-m.m[0][1] * m.m[2][2] * m.m[3][3] - m.m[0][2] * m.m[2][3] * m.m[3][1] - m.m[0][3] * m.m[2][1] * m.m[3][2] +
-		m.m[0][3] * m.m[2][2] * m.m[3][1] + m.m[0][2] * m.m[2][1] * m.m[3][3] + m.m[0][1] * m.m[2][3] * m.m[3][2]) / MatrixA;
-
-	result.m[0][2] = (m.m[0][1] * m.m[1][2] * m.m[3][3] + m.m[0][2] * m.m[1][3] * m.m[3][1] + m.m[0][3] * m.m[1][1] * m.m[3][2] -
-		m.m[0][3] * m.m[1][2] * m.m[3][1] - m.m[0][2] * m.m[1][1] * m.m[3][3] - m.m[0][1] * m.m[1][3] * m.m[3][2]) / MatrixA;
-
-	result.m[0][3] = (-m.m[0][1] * m.m[1][2] * m.m[2][3] - m.m[0][2] * m.m[1][3] * m.m[2][1] - m.m[0][3] * m.m[1][1] * m.m[2][2] +
-		m.m[0][3] * m.m[1][2] * m.m[2][1] + m.m[0][2] * m.m[1][1] * m.m[2][3] + m.m[0][1] * m.m[1][3] * m.m[2][2]) / MatrixA;
-
-#pragma endregion
-
-#pragma region 1列目の逆行列を求める
-
-	result.m[1][0] = (-m.m[1][0] * m.m[2][2] * m.m[3][3] - m.m[1][2] * m.m[2][3] * m.m[3][0] - m.m[1][3] * m.m[2][0] * m.m[3][2] +
-		               m.m[1][3] * m.m[2][2] * m.m[3][0] + m.m[1][2] * m.m[2][0] * m.m[3][3] + m.m[1][0] * m.m[2][3] * m.m[3][2]) / MatrixA;
-
-	result.m[1][1] = (m.m[0][0] * m.m[2][2] * m.m[3][3] + m.m[0][2] * m.m[2][3] * m.m[3][0] + m.m[0][3] * m.m[2][0] * m.m[3][2] -
-		              m.m[0][3] * m.m[2][2] * m.m[3][0] - m.m[0][2] * m.m[2][0] * m.m[3][3] - m.m[0][0] * m.m[2][3] * m.m[3][2]) / MatrixA;
-
-	result.m[1][2] = (-m.m[0][0] * m.m[1][2] * m.m[3][3] - m.m[0][2] * m.m[1][3] * m.m[3][0] - m.m[0][3] * m.m[1][0] * m.m[3][2] +
-		               m.m[0][3] * m.m[1][2] * m.m[3][0] + m.m[0][2] * m.m[1][0] * m.m[3][3] + m.m[0][0] * m.m[1][3] * m.m[3][2]) / MatrixA;
-
-	result.m[1][3] = (m.m[0][0] * m.m[1][2] * m.m[2][3] + m.m[0][2] * m.m[1][3] * m.m[2][0] + m.m[0][3] * m.m[1][0] * m.m[2][2] -
-		              m.m[0][3] * m.m[1][2] * m.m[2][0] - m.m[0][2] * m.m[1][0] * m.m[2][3] - m.m[0][0] * m.m[1][3] * m.m[2][2]) / MatrixA;
-
-#pragma endregion
-
-#pragma region 2列目の逆行列を求める
-
-	result.m[2][0] = (m.m[1][0] * m.m[2][1] * m.m[3][3] + m.m[1][1] * m.m[2][3] * m.m[3][0] + m.m[1][3] * m.m[2][0] * m.m[3][1] -
-		              m.m[1][3] * m.m[2][1] * m.m[3][0] - m.m[1][1] * m.m[2][0] * m.m[3][3] - m.m[1][0] * m.m[2][3] * m.m[3][1]) / MatrixA;
-
-	result.m[2][1] = (-m.m[0][0] * m.m[2][1] * m.m[3][3] - m.m[0][1] * m.m[2][3] * m.m[3][0] - m.m[0][3] * m.m[2][0] * m.m[3][1] +
-		               m.m[0][3] * m.m[2][1] * m.m[3][0] + m.m[0][1] * m.m[2][0] * m.m[3][3] + m.m[0][0] * m.m[2][3] * m.m[3][1]) / MatrixA;
-
-	result.m[2][2] = (m.m[0][0] * m.m[1][1] * m.m[3][3] + m.m[0][1] * m.m[1][3] * m.m[3][0] + m.m[0][3] * m.m[1][0] * m.m[3][1] -
-		              m.m[0][3] * m.m[1][1] * m.m[3][0] - m.m[0][1] * m.m[1][0] * m.m[3][3] - m.m[0][0] * m.m[1][3] * m.m[3][1]) / MatrixA;
-
-	result.m[2][3] = (-m.m[0][0] * m.m[1][1] * m.m[2][3] - m.m[0][1] * m.m[1][3] * m.m[2][0] - m.m[0][3] * m.m[1][0] * m.m[2][1] +
-		               m.m[0][3] * m.m[1][1] * m.m[2][0] + m.m[0][1] * m.m[1][0] * m.m[2][3] + m.m[0][0] * m.m[1][3] * m.m[2][1]) / MatrixA;
-
-#pragma endregion
-
-#pragma region 3列目の逆行列を求める
-
-	result.m[3][0] = (-m.m[1][0] * m.m[2][1] * m.m[3][2] - m.m[1][1] * m.m[2][2] * m.m[3][0] - m.m[1][2] * m.m[2][0] * m.m[3][1] +
-		               m.m[1][2] * m.m[2][1] * m.m[3][0] + m.m[1][1] * m.m[2][0] * m.m[3][2] + m.m[1][0] * m.m[2][2] * m.m[3][1]) / MatrixA;
-
-	result.m[3][1] = (m.m[0][0] * m.m[2][1] * m.m[3][2] + m.m[0][1] * m.m[2][2] * m.m[3][0] + m.m[0][2] * m.m[2][0] * m.m[3][1] -
-		              m.m[0][2] * m.m[2][1] * m.m[3][0] - m.m[0][1] * m.m[2][0] * m.m[3][2] - m.m[0][0] * m.m[2][2] * m.m[3][1]) / MatrixA;
-
-	result.m[3][2] = (-m.m[0][0] * m.m[1][1] * m.m[3][2] - m.m[0][1] * m.m[1][2] * m.m[3][0] - m.m[0][2] * m.m[1][0] * m.m[3][1] +
-		               m.m[0][2] * m.m[1][1] * m.m[3][0] + m.m[0][1] * m.m[1][0] * m.m[3][2] + m.m[0][0] * m.m[1][2] * m.m[3][1]) / MatrixA;
-
-	result.m[3][3] = (m.m[0][0] * m.m[1][1] * m.m[2][2] + m.m[0][1] * m.m[1][2] * m.m[2][0] + m.m[0][2] * m.m[1][0] * m.m[2][1] -
-		              m.m[0][2] * m.m[1][1] * m.m[2][0] - m.m[0][1] * m.m[1][0] * m.m[2][2] - m.m[0][0] * m.m[1][2] * m.m[2][1]) / MatrixA;
-		               
-
-#pragma endregion 
-
-		return result;
-
-}
-
-/// <summary>
-/// 転置行列
-/// </summary>
-/// <param name="m"></param>
-/// <returns></returns>
-Matrix4x4 Calculation::Transpose(const Matrix4x4& m)
-{
-	Matrix4x4 resultTranspose{};
-
-	for (int i = 0; i < 4; i++)
-	{
-		for (int j = 0; j < 4; j++)
-		{
-			resultTranspose.m[i][j] = m.m[j][i];
-		}
-	}
-
-	return resultTranspose;
-}
-
-/// <summary>
-/// 単位行列
-/// </summary>
-/// <returns></returns>
-Matrix4x4 Calculation::MakeIdentity4x4()
-{
-	Matrix4x4 identityMatrix{};
-
-	for (int i = 0; i < 4; i++)
-	{
-		for (int j = 0; j < 4; j++)
-		{
-			if (i == j)
-			{
-				identityMatrix.m[i][j] = 1.0f;
-			}else
-			{
-				identityMatrix.m[i][j] = 0.0f;
-			}
-		}
-	}
-
-	return identityMatrix;
-}
+	return result;
+} 
 
 void Calculation::Update()
 {
-#pragma region 計算クラスのUpdate関数で行列の演算を行う
+#pragma region 計算クラスのUpdateで演算を行う
 
-	resultAdd_ = Calculation::Add(m1_, m2_);
-	resultSubtract_ = Calculation::Subtract(m1_, m2_);
-	resultMultiply_ = Calculation::Multiply(m1_, m2_);
-	inverseM1_ = Calculation::Inverse(m1_);
-	inverseM2_ = Calculation::Inverse(m2_);
-	transposeM1_ = Calculation::Transpose(m1_);
-	transposeM2_ = Calculation::Transpose(m2_);
-	identity_ = Calculation::MakeIdentity4x4();
+	translateMatrix_ = MakeTranslateMatrix(translate_);
+	scaleMatrix_ = MakeScaleMatrix(scale_);
+	transformed_ = Transform(point_, transformMatrix_);
 
 #pragma endregion
 }
 
 void Calculation::Draw()
 {
-#pragma region //計算クラスのDraw関数で計算結果を表示する
+#pragma region 計算クラスのDrawで計算結果の数値を描画する
 
-	MatrixScreenPrintf(0, 0, resultAdd_,"Add");// 行列の加法
-	MatrixScreenPrintf(0, kRowHeight * 5, resultSubtract_,"Subtract");// 行列の減法
-	MatrixScreenPrintf(0, kRowHeight * 5 * 2, resultMultiply_,"Multiply");// 行列の積
-	MatrixScreenPrintf(0, kRowHeight * 5 * 3, inverseM1_,"inverseM1");// 逆行列1
-	MatrixScreenPrintf(0, kRowHeight * 5 * 4, inverseM2_, "inverseM2");// 逆行列2
-	MatrixScreenPrintf(kColumnWidth * 5, 0, transposeM1_,"transposeM1");// 転置行列1
-	MatrixScreenPrintf(kColumnWidth * 5, kRowHeight * 5, transposeM2_,"transposeM2");// 転置行列2
-	MatrixScreenPrintf(kColumnWidth * 5, kRowHeight * 5 * 2, identity_, "indentity");// 単位行列
+	VectorScreenPrintf(0, 0, transformed_, "transformed");
+	MatrixScreenPrintf(0, 0, translateMatrix_, "translateMatrix");
+	MatrixScreenPrintf(0, kRowHeight * 5, scaleMatrix_, "scaleMatrix");
+
 #pragma endregion
 }

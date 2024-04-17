@@ -1,5 +1,6 @@
 #pragma once
 #include "Matrix4x4.h"
+#include "Vector3.h"
 
 /// <summary>
 /// 計算クラスの宣言
@@ -14,6 +15,11 @@ public://メンバ関数
 	Calculation();
 
 	/// <summary>
+	/// 3次元ベクトルの数値表示
+	/// </summary>
+	void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
+
+	/// <summary>
 	/// 4x4行列の数値表示
 	/// </summary>
 	/// <param name="x"></param>
@@ -24,48 +30,26 @@ public://メンバ関数
 #pragma region //4x4行列関数の作成
 
 	/// <summary>
-	/// 1. 行列の加法
+	/// 1. 平行移動行列
 	/// </summary>
-	/// <param name="m1"></param>
-	/// <param name="m2"></param>
+	/// <param name="translate"></param>
 	/// <returns></returns>
-	Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2);
+	Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
 
 	/// <summary>
-	/// 2. 行列の減法
+	/// 2. 拡大縮小行列
 	/// </summary>
-	/// <param name="m1"></param>
-	/// <param name="m2"></param>
+	/// <param name="scale"></param>
 	/// <returns></returns>
-	Matrix4x4 Subtract(const Matrix4x4& m1, const Matrix4x4& m2);
+	Matrix4x4 MakeScaleMatrix(const Vector3& scale);
 
 	/// <summary>
-	/// 3. 行列の積
+	/// 3. 座標変換
 	/// </summary>
-	/// <param name="m1"></param>
-	/// <param name="m2"></param>
+	/// <param name="vector"></param>
+	/// <param name="matrix"></param>
 	/// <returns></returns>
-	Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
-
-	/// <summary>
-	/// 4. 逆行列
-	/// </summary>
-	/// <param name="m"></param>
-	/// <returns></returns>
-	Matrix4x4 Inverse(const Matrix4x4& m);
-
-	/// <summary>
-	/// 5. 転置行列
-	/// </summary>
-	/// <param name="m"></param>
-	/// <returns></returns>
-	Matrix4x4 Transpose(const Matrix4x4& m);
-
-	/// <summary>
-	/// 6. 単位行列
-	/// </summary>
-	/// <returns></returns>
-	Matrix4x4 MakeIdentity4x4();
+	Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);
 
 	/// <summary>
 	/// 更新処理
@@ -79,19 +63,16 @@ public://メンバ関数
 
 #pragma endregion
 
-public:
+public://メンバ変数
 
-	Matrix4x4 m1_;
-	Matrix4x4 m2_;
+	Vector3 translate_;
+	Vector3 scale_;
+	Vector3 point_;
+	Vector3 transformed_;
 
-	Matrix4x4 resultAdd_;
-	Matrix4x4 resultSubtract_;
-	Matrix4x4 resultMultiply_;
-	Matrix4x4 inverseM1_;
-	Matrix4x4 inverseM2_;
-	Matrix4x4 transposeM1_;
-	Matrix4x4 transposeM2_;
-	Matrix4x4 identity_;
+	Matrix4x4 translateMatrix_;
+	Matrix4x4 scaleMatrix_;
+	Matrix4x4 transformMatrix_;
 
 };
 
