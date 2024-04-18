@@ -51,6 +51,12 @@ void Calculation::MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, cons
 	}
 }
 
+/// <summary>
+/// 行列の積
+/// </summary>
+/// <param name="m1"></param>
+/// <param name="m2"></param>
+/// <returns></returns>
 Matrix4x4 Calculation::Multiply(const Matrix4x4 &m1,const Matrix4x4 &m2)
 {
 	Matrix4x4 MultiplyMatrix{};
@@ -68,6 +74,11 @@ Matrix4x4 Calculation::Multiply(const Matrix4x4 &m1,const Matrix4x4 &m2)
 	return MultiplyMatrix;
 }
 
+/// <summary>
+/// 拡大縮小行列
+/// </summary>
+/// <param name="scale"></param>
+/// <returns></returns>
 Matrix4x4 Calculation::MakeScaleMatrix(const Vector3& scale)
 {
 	Matrix4x4 resultScale = {
@@ -80,6 +91,11 @@ Matrix4x4 Calculation::MakeScaleMatrix(const Vector3& scale)
 	return resultScale;
 }
 
+/// <summary>
+/// X軸回転行列
+/// </summary>
+/// <param name="radian"></param>
+/// <returns></returns>
 Matrix4x4 Calculation::MakeRotateXMatrix(float radian)
 {
 	Matrix4x4 rotateXMatrix = {
@@ -92,6 +108,11 @@ Matrix4x4 Calculation::MakeRotateXMatrix(float radian)
 	return rotateXMatrix;
 }
 
+/// <summary>
+/// Y軸回転行列
+/// </summary>
+/// <param name="radian"></param>
+/// <returns></returns>
 Matrix4x4 Calculation::MakeRotateYMatrix(float radian)
 {
 	Matrix4x4 rotateYMatrix = {
@@ -104,6 +125,11 @@ Matrix4x4 Calculation::MakeRotateYMatrix(float radian)
 	return rotateYMatrix;
 }
 
+/// <summary>
+/// Z軸回転行列
+/// </summary>
+/// <param name="radian"></param>
+/// <returns></returns>
 Matrix4x4 Calculation::MakeRotateZMatrix(float radian)
 {
 	Matrix4x4 rotateZMatrix = {
@@ -116,11 +142,21 @@ Matrix4x4 Calculation::MakeRotateZMatrix(float radian)
 	return rotateZMatrix;
 }
 
+/// <summary>
+/// XYZ軸回転行列
+/// </summary>
+/// <param name="radian"></param>
+/// <returns></returns>
 Matrix4x4 Calculation::MakeRotateXYZMatrix(const Vector3 &radian)
 {
 	return Multiply(MakeRotateXMatrix(radian.x), Multiply(MakeRotateYMatrix(radian.y), MakeRotateZMatrix(radian.z)));
 }
 
+/// <summary>
+/// 平行移動行列
+/// </summary>
+/// <param name="translate"></param>
+/// <returns></returns>
 Matrix4x4 Calculation::MakeTranslateMatrix(const Vector3& translate)
 {
 	Matrix4x4 resultTranslate = {
@@ -133,11 +169,19 @@ Matrix4x4 Calculation::MakeTranslateMatrix(const Vector3& translate)
 	return resultTranslate;
 }
 
+/// <summary>
+/// アフィン変換行列
+/// </summary>
+/// <param name="affine"></param>
+/// <returns></returns>
 Matrix4x4 Calculation::MakeAffineMatrix(Affine affine)
 {
 	return Multiply(MakeScaleMatrix(affine.scale), Multiply(MakeRotateXYZMatrix(affine.rotate), MakeTranslateMatrix(affine.translate)));
 }
 
+/// <summary>
+/// 更新処理
+/// </summary>
 void Calculation::Update()
 {
 #pragma region アフィン変換処理
@@ -147,6 +191,9 @@ void Calculation::Update()
 #pragma endregion
 }
 
+/// <summary>
+/// 描画処理
+/// </summary>
 void Calculation::Draw()
 {
 #pragma region 計算結果の表示
