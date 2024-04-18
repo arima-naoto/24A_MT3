@@ -15,11 +15,6 @@ public://メンバ関数
 	Calculation();
 
 	/// <summary>
-	/// 3次元ベクトルの数値表示
-	/// </summary>
-	void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
-
-	/// <summary>
 	/// 4x4行列の数値表示
 	/// </summary>
 	/// <param name="x"></param>
@@ -30,26 +25,33 @@ public://メンバ関数
 #pragma region //4x4行列関数の作成
 
 	/// <summary>
-	/// 1. 平行移動行列
+	/// 1. X軸回転行列
 	/// </summary>
-	/// <param name="translate"></param>
+	/// <param name="radian">角度</param>
 	/// <returns></returns>
-	Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
+	Matrix4x4 MakeRotateXMatrix(float radian);
 
 	/// <summary>
-	/// 2. 拡大縮小行列
+	/// 2. Y軸回転行列
 	/// </summary>
-	/// <param name="scale"></param>
+	/// <param name="radian">角度</param>
 	/// <returns></returns>
-	Matrix4x4 MakeScaleMatrix(const Vector3& scale);
+	Matrix4x4 MakeRotateYMatrix(float radian);
 
 	/// <summary>
-	/// 3. 座標変換
+	/// 3. Z軸回転行列
 	/// </summary>
-	/// <param name="vector"></param>
-	/// <param name="matrix"></param>
+	/// <param name="radian">角度</param>
 	/// <returns></returns>
-	Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);
+	Matrix4x4 MakeRotateZMatrix(float radian);
+
+	/// <summary>
+	/// 行列の積
+	/// </summary>
+	/// <param name="m1"></param>
+	/// <param name="m2"></param>
+	/// <returns></returns>
+	Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
 
 	/// <summary>
 	/// 更新処理
@@ -65,14 +67,13 @@ public://メンバ関数
 
 public://メンバ変数
 
-	Vector3 translate_;
-	Vector3 scale_;
-	Vector3 point_;
-	Vector3 transformed_;
+	Vector3 rotate_;
 
-	Matrix4x4 translateMatrix_;
-	Matrix4x4 scaleMatrix_;
-	Matrix4x4 transformMatrix_;
+	Matrix4x4 rotateXMatrix_;
+	Matrix4x4 rotateYMatrix_;
+	Matrix4x4 rotateZMatrix_;
+
+	Matrix4x4 rotateXYZMatrix_;
 
 };
 
