@@ -7,6 +7,8 @@
 static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
 
+
+
 /// <summary>
 /// 初期化処理
 /// </summary>
@@ -14,7 +16,11 @@ Calculation::Calculation()
 {
 #pragma region 定義しなければならない
 
-	rotate_ = { 0.4f,1.43f,-0.8f };
+	affine_ = {
+		{ 1.2f,0.79f,-2.1f },
+		{ 0.4f,1.43f,-0.8f },
+		{ 2.7f,-4.15f,1.57f }
+	};
 
 	rotateXMatrix_ = {};
 	rotateYMatrix_ = {};
@@ -40,9 +46,38 @@ void Calculation::MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, cons
 	{
 		for (int column = 0; column < 4; column++)
 		{
-			Novice::ScreenPrintf(x + column * kColumnWidth, y + row * kRowHeight + 40 , "%6.02f", matrix.m[row][column]);
+			Novice::ScreenPrintf(x + column * kColumnWidth, y + row * kRowHeight + 20 , "%6.02f", matrix.m[row][column]);
 		}
 	}
+}
+
+Matrix4x4 Calculation::Multiply(const Matrix4x4 &m1,const Matrix4x4 &m2)
+{
+	Matrix4x4 MultiplyMatrix{};
+
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			MultiplyMatrix.m[i][j] = 0;
+			for(int k = 0; k < 4; k++)
+			{
+				MultiplyMatrix.m[i][j] += m1.m[i][k] * m2.m[k][j];
+			}
+		}
+	}
+
+	return MultiplyMatrix;
+}
+
+Matrix4x4 Calculation::MakeScaleMatrix(const Vector3& scale)
+{
+	Matrix4x4 resultScale = {
+		scale.x,0.0f,0.0f,0.0f,
+		0.0f,scale.y,0.0f,0.0f,
+		0.0f,0.0f,scale.z,0.0f,
+		0.0f,0.0f,0.0f,1.0f
+	};
+
+	return resultScale;
 }
 
 Matrix4x4 Calculation::MakeRotateXMatrix(float radian)
@@ -81,38 +116,42 @@ Matrix4x4 Calculation::MakeRotateZMatrix(float radian)
 	return rotateZMatrix;
 }
 
-Matrix4x4 Calculation::Multiply(const Matrix4x4& m1, const Matrix4x4& m2)
+Matrix4x4 Calculation::MakeRotateXYZMatrix(const Vector3 &radian)
 {
-	Matrix4x4 MultiplyMatrix{};
+	return Multiply(MakeRotateXMatrix(radian.x), Multiply(MakeRotateYMatrix(radian.y), MakeRotateZMatrix(radian.z)));
+}
 
-	for (int i = 0; i < 4; i++)
-	{
-		for (int j = 0; j < 4; j++)
-		{
-			MultiplyMatrix.m[i][j] = 0;
-			for (int k = 0; k < 4; k++)
-			{
-				MultiplyMatrix.m[i][j] += m1.m[i][k] * m2.m[k][j];
-			}
-		}
-	}
+Matrix4x4 Calculation::MakeTranslateMatrix(const Vector3& translate)
+{
+	Matrix4x4 resultTranslate = {
+		1.0f,0.0f,0.0f,0.0f,
+		0.0f,1.0f,0.0f,0.0f,
+		0.0f,0.0f,1.0f,0.0f,
+		translate.x,translate.y,translate.z,1.0f
+	};
 
-	return MultiplyMatrix;
+	return resultTranslate;
+}
+
+Matrix4x4 Calculation::MakeAffineMatrix(Affine affine)
+{
+	return Multiply(MakeScaleMatrix(affine.scale), Multiply(MakeRotateXYZMatrix(affine.rotate), MakeTranslateMatrix(affine.translate)));
 }
 
 void Calculation::Update()
 {
-	rotateXMatrix_ = MakeRotateXMatrix(rotate_.x);
-	rotateYMatrix_ = MakeRotateYMatrix(rotate_.y);
-	rotateZMatrix_ = Calculation::MakeRotateZMatrix(rotate_.z);
+#pragma region アフィン変換処理
 
-	rotateXYZMatrix_ = Multiply(rotateXMatrix_, Multiply(rotateYMatrix_, rotateZMatrix_));
+	worldMatrix_ = Calculation::MakeAffineMatrix(affine_);
+
+#pragma endregion
 }
 
 void Calculation::Draw()
 {
-	MatrixScreenPrintf(0, 0, rotateXMatrix_, "rotateXMatrix");
-	MatrixScreenPrintf(0, kRowHeight * 5, rotateYMatrix_, "rotateYMatrix");
-	MatrixScreenPrintf(0, kRowHeight * 5 * 2, rotateZMatrix_, "rotateZMatrix");
-	MatrixScreenPrintf(0, kRowHeight * 5 * 3, rotateXYZMatrix_, "rotateXYZMatrix");
+#pragma region 計算結果の表示
+
+	Calculation::MatrixScreenPrintf(0, 0, worldMatrix_, "worldMatrix");
+
+#pragma endregion
 }
