@@ -147,7 +147,7 @@ Matrix4x4 Calculation::MakeRotateZMatrix(float radian)
 /// </summary>
 /// <param name="radian"></param>
 /// <returns></returns>
-Matrix4x4 Calculation::MakeRotateXYZMatrix(const Vector3 &radian)
+Matrix4x4 Calculation::MakeRotateMatrix(const Vector3 &radian)
 {
 	return Multiply(MakeRotateXMatrix(radian.x), Multiply(MakeRotateYMatrix(radian.y), MakeRotateZMatrix(radian.z)));
 }
@@ -176,7 +176,7 @@ Matrix4x4 Calculation::MakeTranslateMatrix(const Vector3& translate)
 /// <returns></returns>
 Matrix4x4 Calculation::MakeAffineMatrix(Affine affine)
 {
-	return Multiply(MakeScaleMatrix(affine.scale), Multiply(MakeRotateXYZMatrix(affine.rotate), MakeTranslateMatrix(affine.translate)));
+	return Multiply(Multiply(MakeScaleMatrix(affine.scale),MakeRotateMatrix(affine.rotate)),MakeTranslateMatrix(affine.translate));
 }
 
 /// <summary>

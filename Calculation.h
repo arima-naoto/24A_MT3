@@ -69,11 +69,11 @@ public://メンバ関数
 	Matrix4x4 MakeRotateZMatrix(float radian);
 
 	/// <summary>
-	/// XYZ軸回転行列
+	/// 回転行列
 	/// </summary>
 	/// <param name="radian">角度</param>
 	/// <returns></returns>
-	Matrix4x4 MakeRotateXYZMatrix(const Vector3 &radian);
+	Matrix4x4 MakeRotateMatrix(const Vector3 &radian);
 
 	/// <summary>
 	/// 平行移動行列
