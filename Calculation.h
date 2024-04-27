@@ -23,7 +23,7 @@ public://メンバ関数
 	void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
 
 	/// <summary>
-	/// 加減
+	/// 加算
 	/// </summary>
 	/// <param name="v1"></param>
 	/// <param name="v2"></param>
