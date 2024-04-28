@@ -25,6 +25,13 @@ Calculation::Calculation()
 #pragma endregion
 }
 
+/// <summary>
+/// 3次元ベクトルの計算結果表示用
+/// </summary>
+/// <param name="x"></param>
+/// <param name="y"></param>
+/// <param name="vector"></param>
+/// <param name="label"></param>
 void Calculation::VectorScreenPrintf(int x,int y,const Vector3 &vector,const char *label)
 {
 	Novice::ScreenPrintf(x, y, "%.02f", vector.x);
@@ -33,37 +40,59 @@ void Calculation::VectorScreenPrintf(int x,int y,const Vector3 &vector,const cha
 	Novice::ScreenPrintf(x + kColumnWidth * 3, y, "%s", label);
 }
 
+/// <summary>
+/// 加算
+/// </summary>
+/// <param name="v1"></param>
+/// <param name="v2"></param>
+/// <returns></returns>
 Vector3 Calculation::Add(const Vector3& v1, const Vector3& v2)
 {
-    //足し算の計算結果を求める
-	Vector3 resultAdd = { v1.x + v2.x,v1.y + v2.y,v1.z + v2.z };
-	return resultAdd;
+    //加算の計算結果を求める
+	return { v1.x + v2.x,v1.y + v2.y,v1.z + v2.z };;
 }
 
+/// <summary>
+/// 減算
+/// </summary>
+/// <param name="v1"></param>
+/// <param name="v2"></param>
+/// <returns></returns>
 Vector3 Calculation::Subtract(const Vector3& v1, const Vector3& v2)
 {
-    //引き算の計算結果を求める
-	Vector3 resultSubtract = { v1.x - v2.x,v1.y - v2.y,v1.z - v2.z };
-	return resultSubtract;
+	//減算の計算結果を求める
+	return  { v1.x - v2.x,v1.y - v2.y,v1.z - v2.z };
 }
 
+/// <summary>
+/// 乗算
+/// </summary>
+/// <param name="scalar"></param>
+/// <param name="v2"></param>
+/// <returns></returns>
 Vector3 Calculation::Multiply(float scalar, const Vector3& v2)
 {
     //乗算の計算結果を求める
-	Vector3 resultMultiply = { scalar * v2.x ,scalar * v2.y,scalar * v2.z };
-	return resultMultiply;
-
+	return { scalar * v2.x ,scalar * v2.y,scalar * v2.z };
 }
 
+/// <summary>
+/// 内積
+/// </summary>
+/// <param name="v1"></param>
+/// <param name="v2"></param>
+/// <returns></returns>
 float Calculation::Dot(const Vector3& v1, const Vector3& v2)
 {
-#pragma region//内積を求める
-
-	float resultDot = { v1.x * v2.x + v1.y * v2.y + v1.z * v2.z };
-
-	return resultDot;
+	//内積を求める
+	return { v1.x * v2.x + v1.y * v2.y + v1.z * v2.z };
 }
 
+/// <summary>
+/// 長さ(ノルム)
+/// </summary>
+/// <param name="v"></param>
+/// <returns></returns>
 float Calculation::Length(const Vector3 &v)
 {
 	//長さを求める
@@ -71,6 +100,11 @@ float Calculation::Length(const Vector3 &v)
 	return result;
 }
 
+/// <summary>
+/// 正規化
+/// </summary>
+/// <param name="v"></param>
+/// <returns></returns>
 Vector3 Calculation::Normalize(const Vector3& v)
 {
 	//正規化を使用して計算結果を求める
@@ -84,6 +118,9 @@ Vector3 Calculation::Normalize(const Vector3& v)
 	return resultNormalize;
 }
 
+/// <summary>
+/// 更新処理
+/// </summary>
 void Calculation::Update()
 {
 	resultAdd_ = Calculation::Add(v1_, v2_); //足し算
@@ -94,6 +131,9 @@ void Calculation::Update()
 	resultNormalize_ = Calculation::Normalize(v2_);//正規化
 }
 
+/// <summary>
+/// 描画処理
+/// </summary>
 void Calculation::Draw()
 {
 #pragma region 計算結果の表示を行う
