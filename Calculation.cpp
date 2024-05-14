@@ -133,7 +133,7 @@ Matrix4x4 Calculation::Inverse(const Matrix4x4& m)
 #pragma endregion
 
 	Matrix4x4 result;
-#pragma region 0列目の逆行列を求める
+#pragma region 0行目の逆行列を求める
 
 	result.m[0][0] = MatrixA * (m.m[1][1] * m.m[2][2] * m.m[3][3] + m.m[1][2] * m.m[2][3] * m.m[3][1] + m.m[1][3] * m.m[2][1] * m.m[3][2] -
 		m.m[1][3] * m.m[2][2] * m.m[3][1] - m.m[1][2] * m.m[2][1] * m.m[3][3] - m.m[1][1] * m.m[2][3] * m.m[3][2]);
@@ -149,7 +149,7 @@ Matrix4x4 Calculation::Inverse(const Matrix4x4& m)
 
 #pragma endregion
 
-#pragma region 1列目の逆行列を求める
+#pragma region 1行目の逆行列を求める
 
 	result.m[1][0] = MatrixA * (-m.m[1][0] * m.m[2][2] * m.m[3][3] - m.m[1][2] * m.m[2][3] * m.m[3][0] - m.m[1][3] * m.m[2][0] * m.m[3][2] +
 		               m.m[1][3] * m.m[2][2] * m.m[3][0] + m.m[1][2] * m.m[2][0] * m.m[3][3] + m.m[1][0] * m.m[2][3] * m.m[3][2]);
@@ -165,7 +165,7 @@ Matrix4x4 Calculation::Inverse(const Matrix4x4& m)
 
 #pragma endregion
 
-#pragma region 2列目の逆行列を求める
+#pragma region 2行目の逆行列を求める
 
 	result.m[2][0] = MatrixA * (m.m[1][0] * m.m[2][1] * m.m[3][3] + m.m[1][1] * m.m[2][3] * m.m[3][0] + m.m[1][3] * m.m[2][0] * m.m[3][1] -
 		              m.m[1][3] * m.m[2][1] * m.m[3][0] - m.m[1][1] * m.m[2][0] * m.m[3][3] - m.m[1][0] * m.m[2][3] * m.m[3][1]);
@@ -181,7 +181,7 @@ Matrix4x4 Calculation::Inverse(const Matrix4x4& m)
 
 #pragma endregion
 
-#pragma region 3列目の逆行列を求める
+#pragma region 3行目の逆行列を求める
 
 	result.m[3][0] = MatrixA * (-m.m[1][0] * m.m[2][1] * m.m[3][2] - m.m[1][1] * m.m[2][2] * m.m[3][0] - m.m[1][2] * m.m[2][0] * m.m[3][1] +
 		               m.m[1][2] * m.m[2][1] * m.m[3][0] + m.m[1][1] * m.m[2][0] * m.m[3][2] + m.m[1][0] * m.m[2][2] * m.m[3][1]);
