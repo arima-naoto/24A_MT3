@@ -142,7 +142,7 @@ void Calculation::Draw()
 	Calculation::VectorScreenPrintf(0, kRowHeight, resultSubtract_, " : Subtract");
 	Calculation::VectorScreenPrintf(0, kRowHeight * 2, resultMultiply_, " : Multiply");
 	Novice::ScreenPrintf(0, kRowHeight * 3, "%.02f : Dot", resultDot_);
-	Novice::ScreenPrintf(0, kRowHeight * 4, "%.02f : Lendth", resultLength_);
+	Novice::ScreenPrintf(0, kRowHeight * 4, "%.02f : Length", resultLength_);
 	Calculation::VectorScreenPrintf(0, kRowHeight * 5, resultNormalize_, " :  Normalize");
 
 #pragma endregion
