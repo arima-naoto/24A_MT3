@@ -4,7 +4,10 @@
 #include <math.h>
 #include <cassert>
 
+//文字列縦幅
 static const int kRowHeight = 20;
+
+//文字列横幅
 static const int kColumnWidth = 60;
 
 /// <summary>
@@ -14,13 +17,25 @@ Calculation::Calculation()
 {
 #pragma region 定義しなければならない
 
+	//座標
 	translate_ = { 4.1f,2.6f,0.8f };
+	
+	//大きさ
 	scale_ = { 1.5f,5.2f,7.3f };
+	
+	//ポイント
 	point_ = { 2.3f,3.8f,1.4f };
+	
+	//トランスフォーム
 	transformed_ = {};
 
+	//平行移動行列
 	translateMatrix_ = {};
+	
+	//拡大拡縮行列
 	scaleMatrix_ = {};
+	
+	//座標変換行列
 	transformMatrix_ = {
 		1.0f,2.0f,3.0f,4.0f,
 		3.0f,1.0f,1.0f,2.0f,
@@ -127,9 +142,14 @@ void Calculation::Update()
 {
 #pragma region 計算クラスのUpdateで演算を行う
 
-	translateMatrix_ = MakeTranslateMatrix(translate_);
-	scaleMatrix_ = MakeScaleMatrix(scale_);
-	transformed_ = Transform(point_, transformMatrix_);
+	//平行移動行列
+	translateMatrix_ = Calculation::MakeTranslateMatrix(translate_);
+	
+	//拡大縮小行列行列
+	scaleMatrix_ = Calculation::MakeScaleMatrix(scale_);
+	
+	//トランスフォーム
+	transformed_ = Calculation::Transform(point_, transformMatrix_);
 
 #pragma endregion
 }
@@ -138,9 +158,14 @@ void Calculation::Draw()
 {
 #pragma region 計算クラスのDrawで計算結果の数値を描画する
 
-	VectorScreenPrintf(0, 0, transformed_, "transformed");
-	MatrixScreenPrintf(0, 0, translateMatrix_, "translateMatrix");
-	MatrixScreenPrintf(0, kRowHeight * 5, scaleMatrix_, "scaleMatrix");
+	//トランスフォームの計算結果の表示
+	Calculation::VectorScreenPrintf(0, 0, transformed_, "transformed");
+	
+	//平行移動行列の計算結果の表示
+	Calculation::MatrixScreenPrintf(0, 0, translateMatrix_, "translateMatrix");
+	
+	//拡大縮小行列の計算結果の表示
+	Calculation::MatrixScreenPrintf(0, kRowHeight * 5, scaleMatrix_, "scaleMatrix");
 
 #pragma endregion
 }

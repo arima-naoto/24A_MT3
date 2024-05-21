@@ -65,13 +65,25 @@ public://メンバ関数
 
 public://メンバ変数
 
+	//座標
 	Vector3 translate_;
+
+	//倍率
 	Vector3 scale_;
+
+	//ポイント
 	Vector3 point_;
+
+	//トランスフォーム
 	Vector3 transformed_;
 
+	//平行移動行列
 	Matrix4x4 translateMatrix_;
+
+	//拡大拡縮行列
 	Matrix4x4 scaleMatrix_;
+
+	//座標変換行列
 	Matrix4x4 transformMatrix_;
 
 };

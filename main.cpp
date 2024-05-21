@@ -13,6 +13,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = {0};
 	char preKeys[256] = {0};
 
+	//計算クラスのインスタンスを生成
 	Calculation* calculation = new Calculation();
 
 	// ウィンドウの×ボタンが押されるまでループ
