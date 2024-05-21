@@ -2,12 +2,12 @@
 #include "Matrix4x4.h"
 #include "Vector3.h"
 
-//アフィン構造体
+//アフィン構造体の宣言
 struct Affine
 {
-	Vector3 scale;
-	Vector3 rotate;
-	Vector3 translate;
+	Vector3 scale;    // 大きさ
+	Vector3 rotate;   // 回転
+	Vector3 translate;// 座標
 };
 
 /// <summary>
@@ -20,7 +20,8 @@ public://メンバ関数
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	Calculation();
+	/// <param name="affine">アフィン構造体</param>
+	Calculation(Affine affine);
 
 	/// <summary>
 	/// 4x4行列の数値表示
@@ -85,7 +86,7 @@ public://メンバ関数
 	/// <summary>
 	/// アフィン変換行列
 	/// </summary>
-	/// <param name="affine">アフィン</param>
+	/// <param name="affine">アフィン構造体</param>
 	/// <returns></returns>
 	Matrix4x4 MakeAffineMatrix(Affine affine);
 
@@ -103,14 +104,22 @@ public://メンバ関数
 
 public://メンバ変数
 
+	//アフィン構造体
 	Affine affine_;
 
+	//X軸回転行列
 	Matrix4x4 rotateXMatrix_;
+
+	//Y軸回転行列
 	Matrix4x4 rotateYMatrix_;
+
+	//Z軸回転行列
 	Matrix4x4 rotateZMatrix_;
 
-	Matrix4x4 rotateXYZMatrix_;
+	//回転行列
+	Matrix4x4 rotateMatrix_;
 
+	//ワールド行列
 	Matrix4x4 worldMatrix_;
 
 };

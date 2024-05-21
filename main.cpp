@@ -13,7 +13,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = {0};
 	char preKeys[256] = {0};
 
-	Calculation* calculation = new Calculation();
+	//計算用アフィン
+	Affine calculationAffine = {
+		{ 1.2f,0.79f,-2.1f },
+		{ 0.4f,1.43f,-0.8f },
+		{ 2.7f,-4.15f,1.57f }
+	};
+
+	Calculation* calculation = new Calculation(calculationAffine);
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
